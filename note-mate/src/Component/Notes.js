@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+import { loggedIn } from '../Actions';
 
 class Notes extends Component {
     constructor(props) {
@@ -10,6 +13,18 @@ class Notes extends Component {
             addTags: false
         }
     }
+
+    // componentDidMount() {
+    //     this.props.mutate({
+    //         variables: {}
+    //     })
+    //     .then(result => {
+    //         console.log(result)
+    //     })
+    //     .catch(error => {
+    //         console.log(error)
+    //     })
+    // }
 
     searchChangeHandler = event => {
         event.preventDefault();
@@ -34,7 +49,10 @@ class Notes extends Component {
     }
 
     render() {
-        const filter = this.props.notes.filter(note => note.Title.toLowerCase().includes(this.state.search.toLowerCase()));
+        console.log('notes', this.props.notes)
+        console.log('length', this.props.notes.length)
+        console.log('loggedin', this.props.loggedIn)
+        const filter = (this.props.notes.length > 0 && this.props.loggedIn) ? this.props.notes.filter(note => note.title.toLowerCase().includes(this.state.search.toLowerCase())) : [];
         return (
             <div className='Notes'>
             <div className='Notes--Search'>
@@ -42,21 +60,14 @@ class Notes extends Component {
             </div>
             <ul>
                 {filter.map((note, index) => {
-                return <li className='note' onClick={() => {this.props.previewNote(note.Title, note.Text, note.ID)}} key={note.ID} onMouseOver={this.hoverToggle} onMouseOut={this.mouseOut}>
+                return <li className='note' onClick={() => {this.props.previewNote(note.title, note.content, note.id)}} key={note.id} onMouseOver={this.hoverToggle} onMouseOut={this.mouseOut}>
                     <div className="note--title" >
-                    {note.Title.length > 30 ? note.Title.substring(0,30).concat('...') : note.Title}
+                    {note.Title.length > 30 ? note.title.substring(0,30).concat('...') : note.title}
                     </div>
                     <br/>
                     <div className='note--text'>
-                    {note.Text.length > 70 ? note.Text.substring(0,70).concat('...') : note.Text}
+                    {note.content.length > 70 ? note.content.substring(0,70).concat('...') : note.content}
                     </div>
-                    {/* <div className='note--tags' style={this.state.tags ? {display: 'inline'} : {display: 'none'}} onClick={this.addTags}>
-                        +
-                    </div>
-                    <ul style={this.state.addTags ? {display: 'inline'} : {display: 'none'}}>
-                    <li>Blue</li>
-                    <li>Red</li>
-                    </ul> */}
                 </li>
                 })}
             </ul>
@@ -67,8 +78,20 @@ class Notes extends Component {
 
 const mapStateToProps = state => {
     return {
-        notes: state.notes
+        notes: state.notes,
+        loggedIn: state.loggedIn
     }
 }
+
+// const getNotes = gql `
+//     query notes {
+//         notes {
+//             id
+//             title
+//             content
+//         }
+//     }
+// `
+// const NotesComponent = graphql(getNotes)(Notes);
 
 export default connect(mapStateToProps) (Notes);

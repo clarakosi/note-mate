@@ -17,11 +17,13 @@ class ViewNotes extends Component {
 
   componentDidMount() {
     const defaultNote = this.props.notes[0];
-    this.setState({
-      title: defaultNote.Title,
-      text: defaultNote.Text,
-      id: defaultNote.ID
-    })
+    if (defaultNote) {
+      this.setState({
+        title: defaultNote.Title,
+        text: defaultNote.Text,
+        id: defaultNote.ID
+      })
+    }
   }
 
   addNoteToggle = () => {

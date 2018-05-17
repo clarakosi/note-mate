@@ -1,12 +1,8 @@
-import { NOTEADDED, NOTEUPDATED, NOTEDELETED, LOGGEDIN, LOGGEDOUT } from '../Actions'
+import { NOTEADDED, NOTEUPDATED, NOTEDELETED, LOGGEDIN, LOGGEDOUT, GETNOTES } from '../Actions'
 // import { GETTINGNOTES, NOTESRECEIVED, ADDINGNOTE, UPDATINGNOTE, NOTEUPDATED, DELETINGNOTE, NOTEDELETED, ERROR } from '../Actions';
 let id = 0;
 const initialState = {
-    notes: [{
-        ID: id,
-        Title: 'First Note',
-        Text: 'Here is your first note. Feel free to edit or delete this note.'
-    }],
+    notes: [],
     id: id,
     gettingNotes: false,
     notesReceived: false,
@@ -24,6 +20,12 @@ const initialState = {
 
 const noteReducer = (state = initialState, action) => {
     switch(action.type) {
+        case GETNOTES:
+            if (action.payload.length > 0){
+                return {...state, notes: [...state.notes, action.payload]};
+            } else {
+                return {...state}
+            }    
         case NOTEADDED:
             ++id;
             return {...state, notes: [...state.notes, {...action.payload, ID: id}], id: id, noteAdded: true};

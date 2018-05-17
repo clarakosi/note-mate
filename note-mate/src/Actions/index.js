@@ -1,4 +1,10 @@
-// import axios from 'axios';
+// import ApolloClient from "apollo-boost";
+// import gql from "graphql-tag";
+// import { graphql } from 'react-apollo';
+// import { NULL } from "graphql/language/kinds";
+import axios from 'axios';
+
+export const GETNOTES = 'GETNOTES';
 
 export const NOTEADDED = 'NOTEADDED';
 export const NOTEUPDATED = 'NOTEUPDATED';
@@ -7,7 +13,16 @@ export const NOTEDELETED = 'NOTEDELETED';
 export const LOGGEDIN = 'LOGGEDIN';
 export const LOGGEDOUT = 'LOGGEDOUT';
 
+let uri = "http://127.0.0.1:8000/graphql/";
+// const client = new ApolloClient({
+//     uri: "http://127.0.0.1:8000/graphql/"
+// });
 
+export const getNotes = notes => {
+    return dispatch => {
+        dispatch({type: GETNOTES, payload: notes})
+    }
+}
 export const addNote = note => {
     return {
         type: NOTEADDED,
@@ -29,9 +44,10 @@ export const deleteNote = id => {
     }
 }
 
-export const loggedIn = () => {
-    return {
-        type: LOGGEDIN
+export const loggedIn = (token) => {
+    return dispatch => {
+        dispatch({type: LOGGEDIN})
+        window.localStorage.setItem('Authorizatioin', token);
     }
 }
 

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {loggedIn} from '../Actions';
+import {loggedIn, getNotes} from '../Actions';
 import Navigation from './Navigation';
+
+import { graphql} from 'react-apollo';
+import gql from 'graphql-tag';
+import { compose } from 'react-apollo';
 
 class LogIn extends Component {
     constructor(props) {
@@ -23,10 +27,23 @@ class LogIn extends Component {
         const username = this.state.username;
         const password = this.state.password;
 
-        if (username.length > 5 && password.length > 5) {
-            return this.props.loggedIn();
+        if (username && password) {
+            return this.props.mutate({
+                variables: { username: username, password: password }
+            })
+            .then(result => {
+                this.props.loggedIn(result.data.tokenAuth.token);
+                // this.props.getNotes([])
+                console.log(this.props.data)
+                // if (typeof this.props.data.notes == 'array') {
+                return this.props.getNotes(this.props.data.notes);
+                // }
+         
+            })
+            .catch(error => {
+                console.log(error);
+            })
         }
-        return alert('Both the Username and Password must be at least 5 characters long');
     }
 
     signUpToggle = event => {
@@ -81,4 +98,23 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, {loggedIn}) (LogIn);
+const logIn = gql`
+    mutation tokenAuth($username: String!, $password: String!) {
+        tokenAuth(username: $username, password: $password) {
+            token
+        }
+    }
+`;
+
+const gettingNotes = gql`
+    query gettingNotes {
+        notes {
+            id
+            title
+            content
+        }
+    }
+`;
+
+const logInComponent = compose(graphql(logIn), graphql(gettingNotes))(LogIn)
+export default connect(mapStateToProps, {loggedIn, getNotes}) (logInComponent);
